@@ -7,7 +7,7 @@ services:
       - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
       - ./clickhouse/zookeeper-servers.xml:/etc/clickhouse-server/conf.d/zookeeper-servers.xml
       - ./shared/ch-data/clickhouse:/var/lib/clickhouse
-      - ./clickhouse/schema.sql:/var/clickhouse/schema/init.sql
+      - ./clickhouse/schema.sql:/docker-entrypoint-initdb.d/init.sql
     depends_on:
       - kafka
     ports:
@@ -40,8 +40,8 @@ services:
     image: confluentinc/cp-kafka:latest
     networks: 
       - broker-kafka
-    depends_on:
-      - zookeeper
+    links: 
+     - zookeeper
     ports:
       - 9092:9092
       - 29092:29092
