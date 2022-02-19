@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS filters (
   siteVersion Enum8('desktop' = 1, 'mobile' = 2, 'tablet_webview' = 3, 'mobile_webview' = 4),
   ccPath String
 ) ENGINE = Kafka SETTINGS
-            kafka_broker_list = '192.168.1.1:9092',
+            kafka_broker_list = '192.168.0.43:9092',
             kafka_topic_list = 'filters',
             kafka_group_name = 'statistics',
             kafka_format = 'JSONEachRow',
