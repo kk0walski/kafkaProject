@@ -1,0 +1,67 @@
+
+version: '3'
+services:
+  clickhouse-server:
+    image: yandex/clickhouse-server
+    volumes:
+      - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse/zookeeper-servers.xml:/etc/clickhouse-server/conf.d/zookeeper-servers.xml
+      - ./shared/ch-data/clickhouse:/var/lib/clickhouse
+      - ./clickhouse/schema.sql:/var/clickhouse/schema/init.sql
+    depends_on:
+      - kafka
+    ports:
+      - 9000:9000
+    links: 
+      - kafka
+
+  clickhouse-client:
+    image: yandex/clickhouse-client
+    entrypoint:
+      - /bin/sleep
+    ports:
+      - 9003:9000
+    command:
+      - infinity
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    networks: 
+      - broker-kafka
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - ./shared/ch-data/zookeeper:/data
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    networks: 
+      - broker-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+      - 29092:29092
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.1.1
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    networks: 
+      - broker-kafka
+    depends_on:
+      - kafka
+    ports:
+      - 19000:9000
+    environment:
+      KAFKA_BROKERCONNECT: kafka:29092
+networks: 
+  broker-kafka:
+    driver: bridge 
