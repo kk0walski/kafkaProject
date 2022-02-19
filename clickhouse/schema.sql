@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS filters (
   kafka_topic_list = 'filters',
   kafka_group_name = 'statistics',
   kafka_format = 'JSONEachRow',
+  kafka_row_delimiter = '\n',
+  kafka_skip_broken_messages = 1,
   kafka_num_consumers = 2;
 
 

@@ -22,5 +22,6 @@ producer = KafkaProducer(
 for j in range(9999):
     print("Iteration", j)
     message = Filter(time.time(), uuid.uuid4(), f"field#{j}", f"value#{j}", f"#{j}_controller")
+    print(message.to_json())
     producer.send('filters', value=message.to_json())
     sleep(0.5)
